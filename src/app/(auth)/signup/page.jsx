@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-//import authService from "@/appwrite/auth";
+import authService from "@/appwrite/authService";
 
 const formSchema = z.object({
 	name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -30,6 +31,7 @@ const formSchema = z.object({
 
 const SignUp = () => {
 	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 	const { toast } = useToast();
 
 	const form = useForm({
@@ -46,18 +48,21 @@ const SignUp = () => {
 
 		try {
 			// Call signup method from authService
-			//const response = await authService.signup(data);
+			const response = await authService.createAccount(data);
 
 			if (response?.$id) {
 				toast({
 					variant: "success",
 					title: "Account created successfully.",
 					description: "You can now log in with your credentials.",
+					className : "bg-toastSuccess text-green-700"
 				});
+				router.push("/signin");
 			} else if (response?.error) {
 				toast({
 					variant: "destructive",
 					title: response.error,
+					className : "bg-toastError text-green-700"
 				});
 			}
 		} catch (error) {

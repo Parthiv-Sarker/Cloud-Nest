@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-//import authService from "@/appwrite/auth";
+import authService from "@/appwrite/authService";
 
 const formSchema = z.object({
 	email: z.string().email({ message: "Invalid email address." }),
@@ -30,6 +31,7 @@ const formSchema = z.object({
 
 const SignIn = () => {
 	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 	const { toast } = useToast();
 
 	const form = useForm({
@@ -45,18 +47,20 @@ const SignIn = () => {
 
 		try {
 			// Call login method from authService
-			//const response = await authService.login(data);
+			const response = await authService.login(data);
 
 			if (response?.$id) {
-				console.log("Logged in successfully.");
 				toast({
 					variant: "success",
 					title: "Logged in successfully.",
+					className : "bg-toastSuccess text-green-700"
 				});
+				router.push("/dashboard");
 			} else if (response?.error) {
 				toast({
 					variant: "destructive",
 					title: response.error,
+					className : "bg-toastError text-green-700"
 				});
 			}
 		} catch (error) {
